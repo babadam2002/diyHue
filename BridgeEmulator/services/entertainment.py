@@ -158,29 +158,41 @@ def entertainmentService(group, user):
                                 r = int((data[i+3] * 256 + data[i+4]) / 256)
                                 g = int((data[i+5] * 256 + data[i+6]) / 256)
                                 b = int((data[i+7] * 256 + data[i+8]) / 256)
-                            elif data[14] == 1: #cie colorspace
-                                x = (data[i+3] * 256 + data[i+4]) / 65535
-                                y = (data[i+5] * 256 + data[i+6]) / 65535
-                                bri = int((data[i+7] * 256 + data[i+8]) / 256)
-                                r, g, b = convert_xy(x, y, bri)
+                            elif data[14] == 1: #cie colorspace
+                                x = (data[i+3] * 256 + data[i+4]) / 65535
+                                y = (data[i+5] * 256 + data[i+6]) / 65535
+                                bri = int((data[i+7] * 256 + data[i+8]) / 256)
+                                # A fényerő küszöb beállítása
+                                min_brightness_threshold = 20
+                                if bri < min_brightness_threshold:
+                                    r, g, b = 0, 0, 0
+                                else:
+                                    r, g, b = convert_xy(x, y, bri)
                         elif apiVersion == 2:
                             light = lights_v2[data[i]]["light"]
                             if data[14] == 0: #rgb colorspace
                                 r = int((data[i+1] * 256 + data[i+2]) / 256)
                                 g = int((data[i+3] * 256 + data[i+4]) / 256)
                                 b = int((data[i+5] * 256 + data[i+6]) / 256)
-                            elif data[14] == 1: #cie colorspace
-                                x = (data[i+1] * 256 + data[i+2]) / 65535
-                                y = (data[i+3] * 256 + data[i+4]) / 65535
-                                bri = int((data[i+5] * 256 + data[i+6]) / 256)
-                                r, g, b = convert_xy(x, y, bri)
+                            elif data[14] == 1: #cie colorspace
+                                x = (data[i+1] * 256 + data[i+2]) / 65535
+                                y = (data[i+3] * 256 + data[i+4]) / 65535
+                                bri = int((data[i+5] * 256 + data[i+6]) / 256)
+                                # A fényerő küszöb beállítása
+                                min_brightness_threshold = 20
+                                if bri < min_brightness_threshold:
+                                    r, g, b = 0, 0, 0
+                                else:
+                                    r, g, b = convert_xy(x, y, bri)
+                        
                         ##########################################
                         ### GAMMA KORREKCIÓ BEILLESZTÉSE ITT ###
-                        gamma = 1.7
-                        r = int(255 * (r / 255.0)**gamma)
-                        g = int(255 * (g / 255.0)**gamma)
-                        b = int(255 * (b / 255.0)**gamma)
+                        #gamma = 0
+                        #r = int(255 * (r / 255.0)**gamma)
+                        #g = int(255 * (g / 255.0)**gamma)
+                        #b = int(255 * (b / 255.0)**gamma)
                         ##########################################
+
                         if light == None:
                             logging.info("error in light identification")
                             break
