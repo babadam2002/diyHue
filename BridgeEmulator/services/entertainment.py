@@ -158,27 +158,21 @@ def entertainmentService(group, user):
                                 r = int((data[i+3] * 256 + data[i+4]) / 256)
                                 g = int((data[i+5] * 256 + data[i+6]) / 256)
                                 b = int((data[i+7] * 256 + data[i+8]) / 256)
-                            elif data[14] == 1: #cie colorspace
-                                x = (data[i+3] * 256 + data[i+4]) / 65535
-                                y = (data[i+5] * 256 + data[i+6]) / 65535
-                                bri = int((data[i+7] * 256 + data[i+8]) / 256)
-                                # A fényerő küszöb beállítása
-                                min_brightness_threshold = 20
-                                if bri < min_brightness_threshold:
-                                    r, g, b = 0, 0, 0
-                                else:
-                                    r, g, b = convert_xy(x, y, bri)
+                            elif data[14] == 1: #cie colorspace
+                                x = (data[i+3] * 256 + data[i+4]) / 65535
+                                y = (data[i+5] * 256 + data[i+6]) / 65535
+                                bri = int((data[i+7] * 256 + data[i+8]) / 256)
+                                r, g, b = convert_xy(x, y, bri)
                         elif apiVersion == 2:
                             light = lights_v2[data[i]]["light"]
                             if data[14] == 0: #rgb colorspace
                                 r = int((data[i+1] * 256 + data[i+2]) / 256)
                                 g = int((data[i+3] * 256 + data[i+4]) / 256)
                                 b = int((data[i+5] * 256 + data[i+6]) / 256)
-                            elif data[14] == 1: #cie colorspace
-                                x = (data[i+1] * 256 + data[i+2]) / 65535
-                                y = (data[i+3] * 256 + data[i+4]) / 65535
-                                bri = int((data[i+5] * 256 + data[i+6]) / 256)
-                                # A fényerő küszöb beállítása
+                            elif data[14] == 1: #cie colorspace
+                                x = (data[i+1] * 256 + data[i+2]) / 65535
+                                y = (data[i+3] * 256 + data[i+4]) / 65535
+                                bri = int((data[i+5] * 256 + data[i+6]) / 256)
                                 min_brightness_threshold = 20
                                 if bri < min_brightness_threshold:
                                     r, g, b = 0, 0, 0
@@ -510,3 +504,4 @@ class HueConnection(object):
             logging.debug("Reconnecting to Hue bridge to sync. This is normal.") #Reconnect if the connection timed out
             self.disconnect()
             self.connect(hueGroup)
+
