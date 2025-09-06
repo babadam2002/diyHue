@@ -174,18 +174,20 @@ def entertainmentService(group, user):
                                 y = (data[i+3] * 256 + data[i+4]) / 65535
                                 bri = int((data[i+5] * 256 + data[i+6]) / 256)
                                 r, g, b = convert_xy(x, y, bri)
-                # A feketeszint logikája minden colorspace-hez
-                min_brightness_threshold = 5
 
-                if data[14] == 0: #rgb colorspace
-                    # A bri érték kiszámítása RGB adatokból
-                    bri = int((r + g + b) / 3)
-                elif data[14] == 1: #cie colorspace
-                    # A bri érték a CIE adatokból már megvan
-                    pass
-                
-                if bri < min_brightness_threshold:
-                    r, g, b = 0, 0, 0
+                            # A feketeszint logikája minden colorspace-hez
+                            min_brightness_threshold = 5
+
+                            if data[14] == 0: #rgb colorspace
+                                # A bri érték kiszámítása RGB adatokból
+                                bri = int((r + g + b) / 3)
+                            elif data[14] == 1: #cie colorspace
+                                # A bri érték a CIE adatokból már megvan
+                                pass
+                            
+                            if bri < min_brightness_threshold:
+                                r, g, b = 0, 0, 0
+                                
                         if light == None:
                             logging.info("error in light identification")
                             break
