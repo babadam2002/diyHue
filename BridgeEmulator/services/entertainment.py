@@ -184,15 +184,6 @@ def entertainmentService(group, user):
                                     r, g, b = 0, 0, 0
                                 else:
                                     r, g, b = convert_xy(x, y, bri)
-                        
-                        ##########################################
-                        ### GAMMA KORREKCIÓ BEILLESZTÉSE ITT ###
-                        #gamma = 0
-                        #r = int(255 * (r / 255.0)**gamma)
-                        #g = int(255 * (g / 255.0)**gamma)
-                        #b = int(255 * (b / 255.0)**gamma)
-                        ##########################################
-
                         if light == None:
                             logging.info("error in light identification")
                             break
