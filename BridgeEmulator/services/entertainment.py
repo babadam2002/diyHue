@@ -139,13 +139,10 @@ def entertainmentService(group, user):
                         apiVersion = 2
                         counter = len(group.getV2Api()["channels"]) * 7 + 52
                     channels = {}
-                    # Létrehozzuk az UDP socketet a cikluson kívül a hatékonyságért
-                    udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
                     while (i < counter):
                         light = None
                         r,g,b = 0,0,0
                         bri = 0
-                        x, y = 0, 0 # Itt inicializáljuk az 'x' és 'y' változókat
                         if apiVersion == 1:
                             if (data[i+1] * 256 + data[i+2]) in channels:
                                 channels[data[i+1] * 256 + data[i+2]] += 1
@@ -172,6 +169,32 @@ def entertainmentService(group, user):
                             min_brightness_threshold = 40
                             if bri < min_brightness_threshold:
                                 r, g, b = 0, 0, 0
+                            # ==========================================================
+                            # == UDP KIEGÉSZÍTÉS KEZDETE ==
+                            # ==========================================================
+                            try:
+                                if bri == 0 and not (r == 0 and g == 0 and b == 0):
+                                    calculated_bri = max(r, g, b)
+                                else:
+                                    calculated_bri = bri
+
+                                payload = {
+                                    "light_id": light.id_v1,
+                                    "name": light.name,
+                                    "rgb": [r, g, b],
+                                    "bri": calculated_bri
+                                }
+                                message = json.dumps(payload).encode('utf-8')
+
+                                # fix IP és port (pl. UDP log server)
+                                udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+                                udp_socket.sendto(message, ('192.168.0.243', 12345))
+                            except Exception as e:
+                                logging.error(f"Hiba az UDP továbbítás során: {e}")
+                            # ==========================================================
+                            # == UDP KIEGÉSZÍTÉS VÉGE ==
+
+
                         elif apiVersion == 2:
                             light = lights_v2[data[i]]["light"]
                             if data[14] == 0: #rgb colorspace
@@ -194,38 +217,6 @@ def entertainmentService(group, user):
                             logging.info("error in light identification")
                             break
                         logging.debug("Frame: " + str(frameID) + " Light:" + str(light.name) + " RED: " + str(r) + ", GREEN: " + str(g) + ", BLUE: " + str(b) )
-                        # ==========================================================
-                        # == UDP KIEGÉSZÍTÉS KEZDETE ==
-                        # ==========================================================
-                        try:
-                            # Csomagoljuk az adatokat egy JSON objektumba
-                            payload = {
-                                "light_id": light.id_v1, 
-                                "name": light.name, 
-                                "rgb": [r, g, b],
-                            }
-                            message = json.dumps(payload).encode('utf-8')
-                            # Elküldjük az üzenetet egy tetszőleges portra (pl. 12345)
-                            udp_socket.sendto(message, ('192.168.0.243', 12345))
-                        except Exception as e:
-                            logging.error(f"Hiba az UDP továbbítás során: {e}")
-                        # ==========================================================
-                        # == UDP KIEGÉSZÍTÉS VÉGE ==
-                        # ==========================================================
-                        proto = light.protocol
-                        if r == 0 and  g == 0 and  b == 0:
-                            light.state["on"] = False
-                        else:
-                            if bri == 0:
-                                light.state.update({"on": True, "bri": int((r + g + b) / 3), "xy": convert_rgb_xy(r, g, b), "colormode": "xy"})
-                            else:
-                                light.state.update({"on": True, "bri": bri, "xy": [x, y], "colormode": "xy"})
-
-                        # A ciklus léptetése a következő adatblokkra
-                        if apiVersion == 1:
-                            i = i + 9
-                        elif apiVersion == 2:
-                            i = i + 7
                         proto = light.protocol
                         if r == 0 and  g == 0 and  b == 0:
                             light.state["on"] = False
