@@ -193,7 +193,25 @@ def entertainmentService(group, user):
                         if light == None:
                             logging.info("error in light identification")
                             break
-                        logging.debug("Frame: " + str(frameID) + " Light:" + str(light.name) + " RED: " + str(r) + ", GREEN: " + str(g) + ", BLUE: " + str(b)
+                        logging.debug("Frame: " + str(frameID) + " Light:" + str(light.name) + " RED: " + str(r) + ", GREEN: " + str(g) + ", BLUE: " + str(b) )
+                        # ==========================================================
+                        # == UDP KIEGÉSZÍTÉS KEZDETE ==
+                        # ==========================================================
+                        try:
+                            # Csomagoljuk az adatokat egy JSON objektumba
+                            payload = {
+                                "light_id": light.id_v1, 
+                                "name": light.name, 
+                                "rgb": [r, g, b],
+                            }
+                            message = json.dumps(payload).encode('utf-8')
+                            # Elküldjük az üzenetet egy tetszőleges portra (pl. 12345)
+                            udp_socket.sendto(message, ('192.168.0.243', 12345))
+                        except Exception as e:
+                            logging.error(f"Hiba az UDP továbbítás során: {e}")
+                        # ==========================================================
+                        # == UDP KIEGÉSZÍTÉS VÉGE ==
+                        # ==========================================================
                         proto = light.protocol
                         if r == 0 and  g == 0 and  b == 0:
                             light.state["on"] = False
