@@ -143,6 +143,7 @@ def entertainmentService(group, user):
                         light = None
                         r,g,b = 0,0,0
                         bri = 0
+                        x, y = 0, 0
                         if apiVersion == 1:
                             if (data[i+1] * 256 + data[i+2]) in channels:
                                 channels[data[i+1] * 256 + data[i+2]] += 1
