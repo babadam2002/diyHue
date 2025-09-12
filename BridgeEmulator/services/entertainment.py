@@ -139,81 +139,88 @@ def entertainmentService(group, user):
                         apiVersion = 2
                         counter = len(group.getV2Api()["channels"]) * 7 + 52
                     channels = {}
-                    while (i < counter):
+                    while i < counter:
                         light = None
-                        r,g,b = 0,0,0
+                        r, g, b = 0, 0, 0
                         bri = 0
                         x, y = 0, 0
+
                         if apiVersion == 1:
-                            if (data[i+1] * 256 + data[i+2]) in channels:
-                                channels[data[i+1] * 256 + data[i+2]] += 1
+                            light_id = data[i+1] * 256 + data[i+2]
+                            logging.debug(f"Processing V1 light ID: {light_id}")
+
+                            if light_id in channels:
+                                channels[light_id] += 1
                             else:
-                                channels[data[i+1] * 256 + data[i+2]] = 0
-                            if data[i] == 0:  # Type of device 0x00 = Light
-                                if data[i+1] * 256 + data[i+2] == 0:
-                                    break
-                                light = lights_v1[data[i+1] * 256 + data[i+2]]
-                            elif data[i] == 1:  # Type of device Gradient Strip
+                                channels[light_id] = 0
+
+                            if data[i] == 0:  # Type: Light
+                                light = lights_v1.get(light_id)
+                                if not light:
+                                    logging.warning(f"Light with ID {light_id} not found in lights_v1")
+                                    i += 9
+                                    continue
+                            elif data[i] == 1:  # Gradient Strip
                                 light = findGradientStrip(group)
-                            if data[14] == 0: #rgb colorspace
+                                if light == "not found":
+                                    logging.warning("No gradient strip found")
+                                    i += 9
+                                    continue
+
+                            if data[14] == 0:  # RGB
                                 r = int((data[i+3] * 256 + data[i+4]) / 256)
                                 g = int((data[i+5] * 256 + data[i+6]) / 256)
                                 b = int((data[i+7] * 256 + data[i+8]) / 256)
-                                # A bri érték kiszámítása az RGB adatokból
                                 bri = int((r + g + b) / 3)
-                            elif data[14] == 1: #cie colorspace
+                            elif data[14] == 1:  # CIE
                                 x = (data[i+3] * 256 + data[i+4]) / 65535
                                 y = (data[i+5] * 256 + data[i+6]) / 65535
                                 bri = int((data[i+7] * 256 + data[i+8]) / 256)
                                 r, g, b = convert_xy(x, y, bri)
-                            # A feketeszint logikája a fényerő alapján
-                            min_brightness_threshold = 40
-                            if bri < min_brightness_threshold:
-                                r, g, b = 0, 0, 0
-                            # ==========================================================
-                            # == UDP KIEGÉSZÍTÉS KEZDETE ==
-                            # ==========================================================
-                            try:
-                                if bri == 0 and not (r == 0 and g == 0 and b == 0):
-                                    calculated_bri = max(r, g, b)
-                                else:
-                                    calculated_bri = bri
 
-                                payload = {
-                                    "light_id": light.id_v1,
-                                    "name": light.name,
-                                    "rgb": [r, g, b],
-                                    "bri": calculated_bri
-                                }
-                                message = json.dumps(payload).encode('utf-8')
-
-                                # fix IP és port (pl. UDP log server)
-                                udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-                                udp_socket.sendto(message, ('192.168.0.243', 12345))
-                            except Exception as e:
-                                logging.error(f"Hiba az UDP továbbítás során: {e}")
-                            # ==========================================================
-                            # == UDP KIEGÉSZÍTÉS VÉGE ==
-
+                            i += 9  # következő V1 light
 
                         elif apiVersion == 2:
+                            if i >= len(lights_v2):
+                                logging.warning(f"V2 data index {i} out of range")
+                                break
+
                             light = lights_v2[data[i]]["light"]
-                            if data[14] == 0: #rgb colorspace
+                            if data[14] == 0:  # RGB
                                 r = int((data[i+1] * 256 + data[i+2]) / 256)
                                 g = int((data[i+3] * 256 + data[i+4]) / 256)
                                 b = int((data[i+5] * 256 + data[i+6]) / 256)
-                                # A bri érték kiszámítása az RGB adatokból
                                 bri = int((r + g + b) / 3)
-                            elif data[14] == 1: #cie colorspace
+                            elif data[14] == 1:  # CIE
                                 x = (data[i+1] * 256 + data[i+2]) / 65535
                                 y = (data[i+3] * 256 + data[i+4]) / 65535
                                 bri = int((data[i+5] * 256 + data[i+6]) / 256)
                                 r, g, b = convert_xy(x, y, bri)
 
-                            # A feketeszint logikája a fényerő alapján
-                            min_brightness_threshold = 40
-                            if bri < min_brightness_threshold:
-                                r, g, b = 0, 0, 0
+                            i += 7  # következő V2 light
+
+                        # Fekete logika
+                        min_brightness_threshold = 40
+                        if bri < min_brightness_threshold:
+                            r, g, b = 0, 0, 0
+
+                        # UDP küldés
+                        try:
+                            calculated_bri = bri if bri != 0 else max(r, g, b)
+                            payload = {
+                                "light_id": light.id_v1,
+                                "name": light.name,
+                                "rgb": [r, g, b],
+                                "bri": calculated_bri
+                            }
+
+                            logging.debug(f"Sending UDP payload: {payload}")
+                            udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+                            udp_socket.sendto(json.dumps(payload).encode('utf-8'), ('192.168.0.243', 12345))
+                            udp_socket.close()
+
+                        except Exception as e:
+                            logging.error(f"UDP sending error for light {light.name}: {e}")
                         if light == None:
                             logging.info("error in light identification")
                             break
