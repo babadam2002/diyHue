@@ -145,7 +145,7 @@ def entertainmentService(group, user):
                         light = None
                         r,g,b = 0,0,0
                         bri = 0
-                        x, y = 0, 0 # Itt inicializáljuk az 'x' és 'y' változókat
+                        #x, y = 0, 0 # Itt inicializáljuk az 'x' és 'y' változókat
                         if apiVersion == 1:
                             if (data[i+1] * 256 + data[i+2]) in channels:
                                 channels[data[i+1] * 256 + data[i+2]] += 1
@@ -199,10 +199,10 @@ def entertainmentService(group, user):
                         # ==========================================================
                         try:
                             # Ha nem kaptunk külön 'bri' értéket, számolunk egyet az RGB-ből
-                            if bri == 0 and not (r == 0 and g == 0 and b == 0):
-                                calculated_bri = max(r, g, b)
-                            else:
-                                calculated_bri = bri
+                            #if bri == 0 and not (r == 0 and g == 0 and b == 0):
+                           #     calculated_bri = max(r, g, b)
+                            #else:
+                             #   calculated_bri = bri
 
                             # Csomagoljuk az adatokat egy JSON objektumba
                             payload = {
