@@ -170,32 +170,6 @@ def entertainmentService(group, user):
                             min_brightness_threshold = 40
                             if bri < min_brightness_threshold:
                                 r, g, b = 0, 0, 0
-                            # ==========================================================
-                            # == UDP KIEGÉSZÍTÉS KEZDETE ==
-                            # ==========================================================
-                            try:
-                                if bri == 0 and not (r == 0 and g == 0 and b == 0):
-                                    calculated_bri = max(r, g, b)
-                                else:
-                                    calculated_bri = bri
-
-                                payload = {
-                                    "light_id": light.id_v1,
-                                    "name": light.name,
-                                    "rgb": [r, g, b],
-                                    "bri": calculated_bri
-                                }
-                                message = json.dumps(payload).encode('utf-8')
-
-                                # fix IP és port (pl. UDP log server)
-                                udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-                                udp_socket.sendto(message, ('192.168.0.243', 12345))
-                            except Exception as e:
-                                logging.error(f"Hiba az UDP továbbítás során: {e}")
-                            # ==========================================================
-                            # == UDP KIEGÉSZÍTÉS VÉGE ==
-
-
                         elif apiVersion == 2:
                             light = lights_v2[data[i]]["light"]
                             if data[14] == 0: #rgb colorspace
@@ -214,35 +188,24 @@ def entertainmentService(group, user):
                             min_brightness_threshold = 40
                             if bri < min_brightness_threshold:
                                 r, g, b = 0, 0, 0
-                            # ==========================================================
-                            # == UDP KIEGÉSZÍTÉS KEZDETE ==
-                            # ==========================================================
-                            try:
-                                if bri == 0 and not (r == 0 and g == 0 and b == 0):
-                                    calculated_bri = max(r, g, b)
-                                else:
-                                    calculated_bri = bri
-
-                                payload = {
-                                    "light_id": light.id_v1,
-                                    "name": light.name,
-                                    "rgb": [r, g, b],
-                                    "bri": calculated_bri
-                                }
-                                message = json.dumps(payload).encode('utf-8')
-
-                                # fix IP és port (pl. UDP log server)
-                                udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-                                udp_socket.sendto(message, ('192.168.0.243', 4321))
-                            except Exception as e:
-                                logging.error(f"Hiba az UDP továbbítás során: {e}")
-                            # ==========================================================
-                            # == UDP KIEGÉSZÍTÉS VÉGE ==
                         
                         if light == None:
                             logging.info("error in light identification")
                             break
                         logging.debug("Frame: " + str(frameID) + " Light:" + str(light.name) + " RED: " + str(r) + ", GREEN: " + str(g) + ", BLUE: " + str(b) )
+                            udp_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+                            UDP_IP = "127.0.0.1"   # vagy a másik gép IP-je
+                            UDP_PORT = 5005        # tetszőleges port
+
+                            # majd a frame logolás után:
+                            message = json.dumps({
+                                "frame": frameID,
+                                "light": light.name,
+                                "r": r,
+                                "g": g,
+                                "b": b
+                            })
+                            udp_sock.sendto(message.encode(), (UDP_IP, UDP_PORT))
                         proto = light.protocol
                         if r == 0 and  g == 0 and  b == 0:
                             light.state["on"] = False
