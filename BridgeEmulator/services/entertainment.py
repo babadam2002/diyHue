@@ -200,7 +200,7 @@ def entertainmentService(group, user):
 
                             udp_message = json.dumps({
                                 "frame": frameID,
-                                "light": light_name,
+                                "light": light.name,
                                 "r": r,
                                 "g": g,
                                 "b": b
