@@ -189,7 +189,7 @@ def entertainmentService(group, user):
                             if bri < min_brightness_threshold:
                                 r, g, b = 0, 0, 0
                             # --- Debug üzenet valós idejű konzolra ---
-                            msg = "Frame: " + str(frameID) + " Light:" + str(light_name) + " RED: " + str(r) + ", GREEN: " + str(g) + ", BLUE: " + str(b)
+                            msg = "Frame: " + str(frameID) + " Light:" + str(light.name) + " RED: " + str(r) + ", GREEN: " + str(g) + ", BLUE: " + str(b)
                             print(msg)  # mindig kiírja Python konzolra
 
                             # --- UDP küldés ugyanebben a blokkban ---
