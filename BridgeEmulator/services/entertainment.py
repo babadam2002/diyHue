@@ -188,7 +188,25 @@ def entertainmentService(group, user):
                             min_brightness_threshold = 40
                             if bri < min_brightness_threshold:
                                 r, g, b = 0, 0, 0
-                        
+                            # --- Debug üzenet valós idejű konzolra ---
+                            msg = "Frame: " + str(frameID) + " Light:" + str(light_name) + " RED: " + str(r) + ", GREEN: " + str(g) + ", BLUE: " + str(b)
+                            print(msg)  # mindig kiírja Python konzolra
+
+                            # --- UDP küldés ugyanebben a blokkban ---
+
+                            udp_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+                            UDP_IP = "127.0.0.1"
+                            UDP_PORT = 5005
+
+                            udp_message = json.dumps({
+                                "frame": frameID,
+                                "light": light_name,
+                                "r": r,
+                                "g": g,
+                                "b": b
+                            })
+                            udp_sock.sendto(udp_message.encode(), (UDP_IP, UDP_PORT))
+                            udp_sock.close()
                         if light == None:
                             logging.info("error in light identification")
                             break
