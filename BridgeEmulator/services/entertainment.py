@@ -195,7 +195,7 @@ def entertainmentService(group, user):
                             # --- UDP küldés ugyanebben a blokkban ---
 
                             udp_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-                            UDP_IP = "127.0.0.1"
+                            UDP_IP = "192.168.0.243"
                             UDP_PORT = 5005
 
                             udp_message = json.dumps({
