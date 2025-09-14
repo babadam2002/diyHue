@@ -15,13 +15,21 @@ briTolerange = 16 # new frames will be ignored if the brightness change is small
 lastAppliedFrame = {}
 YeelightConnections = {}
 
-# UDP cél IP és port
-UDP_IP = "192.168.0.243"  # Állítsd be a cél IP-t
-UDP_PORT = 5005           # Állítsd be a cél portot
-
-# Socket létrehozása
+UDP_IP = "192.168.0.243"
+UDP_PORT = 12345
 udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
+def send_light_data(light_name, r, g, b):
+    try:
+        data = {
+            "light": light_name,
+            "r": r,
+            "g": g,
+            "b": b
+        }
+        udp_socket.sendto(json.dumps(data).encode(), (UDP_IP, UDP_PORT))
+    except Exception as e:
+        print(f"UDP hiba: {e}")
 
 def skipSimilarFrames(light, color, brightness):
     if light not in lastAppliedFrame: # check if light exist in dictionary
@@ -200,14 +208,8 @@ def entertainmentService(group, user):
                             logging.info("error in light identification")
                             break
                         logging.debug("Frame: " + str(frameID) + " Light:" + str(light.name) + " RED: " + str(r) + ", GREEN: " + str(g) + ", BLUE: " + str(b) )
-                        # ✅ Itt jön az UDP küldés
-                        udp_data = {
-                            "light": light.name,
-                            "r": r,
-                            "g": g,
-                            "b": b
-                        }
-                        udp_socket.sendto(json.dumps(udp_data).encode(), (UDP_IP, UDP_PORT))
+                        send_light_data(light.name, r, g, b)
+
                         proto = light.protocol
                         if r == 0 and  g == 0 and  b == 0:
                             light.state["on"] = False
