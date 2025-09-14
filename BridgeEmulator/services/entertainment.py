@@ -15,6 +15,14 @@ briTolerange = 16 # new frames will be ignored if the brightness change is small
 lastAppliedFrame = {}
 YeelightConnections = {}
 
+# UDP cél IP és port
+UDP_IP = "192.168.0.243"  # Állítsd be a cél IP-t
+UDP_PORT = 5005           # Állítsd be a cél portot
+
+# Socket létrehozása
+udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
+
 def skipSimilarFrames(light, color, brightness):
     if light not in lastAppliedFrame: # check if light exist in dictionary
         lastAppliedFrame[light] = {"xy": [0,0], "bri": 0}
@@ -188,29 +196,19 @@ def entertainmentService(group, user):
                             min_brightness_threshold = 40
                             if bri < min_brightness_threshold:
                                 r, g, b = 0, 0, 0
-                            # --- Debug üzenet valós idejű konzolra ---
-                            msg = "Frame: " + str(frameID) + " Light:" + str(light.name) + " RED: " + str(r) + ", GREEN: " + str(g) + ", BLUE: " + str(b)
-                            print(msg)  # mindig kiírja Python konzolra
-
-                            # --- UDP küldés ugyanebben a blokkban ---
-
-                            udp_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-                            UDP_IP = "192.168.0.243"
-                            UDP_PORT = 5005
-
-                            udp_message = json.dumps({
-                                "frame": frameID,
-                                "light": light.name,
-                                "r": r,
-                                "g": g,
-                                "b": b
-                            })
-                            udp_sock.sendto(udp_message.encode(), (UDP_IP, UDP_PORT))
-                            udp_sock.close()
                         if light == None:
                             logging.info("error in light identification")
                             break
                         logging.debug("Frame: " + str(frameID) + " Light:" + str(light.name) + " RED: " + str(r) + ", GREEN: " + str(g) + ", BLUE: " + str(b) )
+                        # ✅ Itt jön az UDP küldés
+                        udp_data = {
+                            "light": light.name,
+                            "r": r,
+                            "g": g,
+                            "b": b
+                        }
+                        udp_socket.sendto(json.dumps(udp_data).encode(), (UDP_IP, UDP_PORT))
+                        proto = light.protocol
                         if r == 0 and  g == 0 and  b == 0:
                             light.state["on"] = False
                         else:
