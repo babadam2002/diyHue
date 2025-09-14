@@ -193,19 +193,19 @@ def entertainmentService(group, user):
                             logging.info("error in light identification")
                             break
                         logging.debug("Frame: " + str(frameID) + " Light:" + str(light.name) + " RED: " + str(r) + ", GREEN: " + str(g) + ", BLUE: " + str(b) )
-                            udp_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-                            UDP_IP = "127.0.0.1"   # vagy a másik gép IP-je
-                            UDP_PORT = 5005        # tetszőleges port
+                         udp_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+                         UDP_IP = "127.0.0.1"   # vagy a másik gép IP-je
+                         UDP_PORT = 5005        # tetszőleges port
 
-                            # majd a frame logolás után:
-                            message = json.dumps({
-                                "frame": frameID,
-                                "light": light.name,
-                                "r": r,
-                                "g": g,
-                                "b": b
-                            })
-                            udp_sock.sendto(message.encode(), (UDP_IP, UDP_PORT))
+                           # majd a frame logolás után:
+                         message = json.dumps({
+                             "frame": frameID,
+                             "light": light.name,
+                             "r": r,
+                             "g": g,
+                             "b": b
+                         })
+                        udp_sock.sendto(message.encode(), (UDP_IP, UDP_PORT))
                         proto = light.protocol
                         if r == 0 and  g == 0 and  b == 0:
                             light.state["on"] = False
