@@ -186,6 +186,7 @@ def entertainmentService(group, user):
                             min_brightness_threshold = 35
                             if bri < min_brightness_threshold:
                                 r, g, b = 0, 0, 0
+                            send_light_data(light, r, g, b)
                         elif apiVersion == 2:
                             light = lights_v2[data[i]]["light"]
                             if data[14] == 0: #rgb colorspace
