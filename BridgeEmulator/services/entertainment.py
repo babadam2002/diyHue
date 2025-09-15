@@ -15,8 +15,8 @@ briTolerange = 16 # new frames will be ignored if the brightness change is small
 lastAppliedFrame = {}
 YeelightConnections = {}
 
-UDP_IP = options.get("udp_ip")
-UDP_PORT = options.get("udp_port", 12345)# ha nincs megadva, default
+UDP_IP = options.get("Entertainment_Area_Extender_udp_ip")
+UDP_PORT = options.get("Entertainment_Area_Extender_udp_port", 12345)# ha nincs megadva, default
 udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
 def send_light_data(light, r, g, b):
