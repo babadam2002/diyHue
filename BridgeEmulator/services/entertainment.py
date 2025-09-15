@@ -190,7 +190,7 @@ def entertainmentService(group, user):
                                 bri = int((data[i+7] * 256 + data[i+8]) / 256)
                                 r, g, b = convert_xy(x, y, bri)
                             # A feketeszint logikája a fényerő alapján
-                            min_brightness_threshold = 35
+                            min_brightness_threshold = options.get("min_brightness_threshold", 35)
                             if bri < min_brightness_threshold:
                                 r, g, b = 0, 0, 0
                             send_light_data(light, r, g, b)
@@ -209,7 +209,7 @@ def entertainmentService(group, user):
                                 r, g, b = convert_xy(x, y, bri)
 
                             # A feketeszint logikája a fényerő alapján
-                            min_brightness_threshold = 35
+                            min_brightness_threshold = options.get("min_brightness_threshold", 35)
                             if bri < min_brightness_threshold:
                                 r, g, b = 0, 0, 0
                             send_light_data(light, r, g, b)
