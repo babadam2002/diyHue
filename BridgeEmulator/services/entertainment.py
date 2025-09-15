@@ -15,8 +15,12 @@ briTolerange = 16 # new frames will be ignored if the brightness change is small
 lastAppliedFrame = {}
 YeelightConnections = {}
 
-UDP_IP = options.get("Entertainment_Area_Extender_udp_ip")
-UDP_PORT = options.get("Entertainment_Area_Extender_udp_port", 12345)# ha nincs megadva, default
+with open("/data/options.json") as f:
+    options = json.load(f)
+
+UDP_IP = options.get("Entertainment_Area_Extender_udp_ip")   # csak akkor működik, ha a configban meg van adva
+UDP_PORT = options.get("Entertainment_Area_Extender_udp_port", 12345)
+
 udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
 def send_light_data(light, r, g, b):
@@ -27,7 +31,10 @@ def send_light_data(light, r, g, b):
             "g": g,
             "b": b
         }
-        udp_socket.sendto(json.dumps(data).encode(), (UDP_IP, UDP_PORT))
+        if UDP_IP:  # csak akkor próbál küldeni, ha van IP
+            udp_socket.sendto(json.dumps(data).encode(), (UDP_IP, UDP_PORT))
+        else:
+            print("⚠️ Nincs beállítva UDP_IP a configban, nem lehet küldeni.")
     except Exception as e:
         print(f"UDP hiba: {e}")
 
