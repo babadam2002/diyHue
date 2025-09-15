@@ -15,7 +15,7 @@ briTolerange = 16 # new frames will be ignored if the brightness change is small
 lastAppliedFrame = {}
 YeelightConnections = {}
 
-UDP_IP = "192.168.0.244"
+UDP_IP = "192.168.0.242"
 UDP_PORT = 12345
 udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
