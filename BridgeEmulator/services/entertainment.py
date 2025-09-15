@@ -15,14 +15,14 @@ briTolerange = 16 # new frames will be ignored if the brightness change is small
 lastAppliedFrame = {}
 YeelightConnections = {}
 
-UDP_IP = "192.168.0.243"
+UDP_IP = "192.168.0.244"
 UDP_PORT = 12345
 udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
-def send_light_data(light_name, r, g, b):
+def send_light_data(light, r, g, b):
     try:
         data = {
-            "light": light_name,
+            "light": light.name,
             "r": r,
             "g": g,
             "b": b
@@ -183,7 +183,7 @@ def entertainmentService(group, user):
                                 bri = int((data[i+7] * 256 + data[i+8]) / 256)
                                 r, g, b = convert_xy(x, y, bri)
                             # A feketeszint logikája a fényerő alapján
-                            min_brightness_threshold = 40
+                            min_brightness_threshold = 35
                             if bri < min_brightness_threshold:
                                 r, g, b = 0, 0, 0
                         elif apiVersion == 2:
@@ -201,14 +201,15 @@ def entertainmentService(group, user):
                                 r, g, b = convert_xy(x, y, bri)
 
                             # A feketeszint logikája a fényerő alapján
-                            min_brightness_threshold = 40
+                            min_brightness_threshold = 35
                             if bri < min_brightness_threshold:
                                 r, g, b = 0, 0, 0
+                            send_light_data(light, r, g, b)
                         if light == None:
                             logging.info("error in light identification")
                             break
                         logging.debug("Frame: " + str(frameID) + " Light:" + str(light.name) + " RED: " + str(r) + ", GREEN: " + str(g) + ", BLUE: " + str(b) )
-                        send_light_data(light.name, r, g, b)
+
 
                         proto = light.protocol
                         if r == 0 and  g == 0 and  b == 0:
