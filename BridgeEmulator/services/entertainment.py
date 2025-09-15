@@ -205,7 +205,6 @@ def entertainmentService(group, user):
                             min_brightness_threshold = 35
                             if bri < min_brightness_threshold:
                                 r, g, b = 0, 0, 0
-                            send_light_data(light, r, g, b)
                         if light == None:
                             logging.info("error in light identification")
                             break
