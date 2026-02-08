@@ -2,11 +2,11 @@ import json
 import requests
 import logManager
 from functions.colors import convert_rgb_xy, convert_xy, hsv_to_rgb
-from typing import List, Dict, Any, Tuple
+from typing import List, Dict, Any
 
 logging = logManager.logger.get_logger(__name__)
 
-BASE_URL = "https://developer-api.govee.com"
+BASE_URL = "https://openapi.api.govee.com/router/api/v1"
 BASE_TYPE = "devices.capabilities."
 
 def get_headers() -> Dict[str, str]:
@@ -48,7 +48,7 @@ def discover(detectedLights: List[Dict[str, Any]]) -> None:
     """
     logging.debug("Govee: <discover> invoked!")
     try:
-        response = requests.get(f"{BASE_URL}/devices", headers=get_headers())
+        response = requests.get(f"{BASE_URL}/user/devices", headers=get_headers())
         response.raise_for_status()
         if response.content and is_json(response.content):  # Check if response content is valid JSON
             devices = response.json().get("data", {})
@@ -93,7 +93,7 @@ def handle_segmented_device(device: Dict[str, Any], device_name: str, detectedLi
     for option in range(segments):
         detectedLights.append(create_light_entry(device, device_name, option, bri_range))
 
-def get_segmented_device_info(device: Dict[str, Any]) -> Tuple[int, Dict[str, Any]]:
+def get_segmented_device_info(device: Dict[str, Any]) -> tuple[int, Dict[str, Any]]:
     """
     Get the number of segments and brightness range for a segmented device.
 
