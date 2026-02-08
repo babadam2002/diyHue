@@ -2,7 +2,7 @@ import json
 import requests
 import logManager
 from functions.colors import convert_rgb_xy, convert_xy, hsv_to_rgb
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Tuple
 
 logging = logManager.logger.get_logger(__name__)
 
