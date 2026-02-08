@@ -10,16 +10,12 @@ BASE_URL = "https://openapi.api.govee.com/router/api/v1"
 BASE_TYPE = "devices.capabilities."
 
 def get_headers() -> Dict[str, str]:
-    """
-    Get the headers required for Govee API requests.
-
-    Returns:
-        dict: Headers including API key and content type.
-    """
     import configManager
     bridgeConfig = configManager.bridgeConfig.yaml_config
+    # A .strip() eltávolítja a láthatatlan \r és \n karaktereket a kulcs végéről!
+    api_key = bridgeConfig["config"]["govee"].get('api_key', '').strip()
     return {
-        "Govee-API-Key": bridgeConfig["config"]["govee"].get('api_key', ''),
+        "Govee-API-Key": api_key,
         "Content-Type": "application/json"
     }
 
