@@ -210,6 +210,8 @@ diyHue is and will be Free to use. However it does take a lot of time to maintai
 Long story short.... you can support us at Ko-Fi
 
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/R6R54Y1LF)
+## Support Me!
+[![ko-fi](https://www.ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/babadam)
 
 Thank you very much!
 
