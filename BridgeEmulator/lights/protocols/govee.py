@@ -93,7 +93,7 @@ def handle_segmented_device(device: Dict[str, Any], device_name: str, detectedLi
     for option in range(segments):
         detectedLights.append(create_light_entry(device, device_name, option, bri_range))
 
-def get_segmented_device_info(device: Dict[str, Any]) -> tuple[int, Dict[str, Any]]:
+def get_segmented_device_info(device: Dict[str, Any]) -> Tuple[int, Dict[str, Any]]:
     """
     Get the number of segments and brightness range for a segmented device.
 
